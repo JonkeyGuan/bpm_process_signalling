@@ -18,7 +18,7 @@ In this reference architecture we will discuss several mechanisms that can be us
 
 The {bpmn2_specification} provides event types such as _throwing intermediate message_ event and _throwing intermediate signal_ event that can be used to model a process node that signals or starts another process instance. 
 
-However, the implementation details of the BPMS engine does not allow to use these event types in all use cases. When not suited, other constructs like script nodes or custom Workitem handlers can be used to achieve inter-process signalling.
+However, the implementation details of the BPMS engine does not allow to use these event types in all use cases. When not suited, other constructs like script nodes or custom Work Item Handlers can be used to achieve inter-process signalling.
 
 In this reference architecture, we will discuss the limitations of the BPMN event types, and provide examples of alternative approaches. The examples are based on and have been tested with BPMS 6.1 .
 
@@ -62,14 +62,14 @@ image::images/signalled_process.png[]
 image::images/signalling_event_process.png[]
 
 * `signalled_process` has a _catching intermediate signal_ event node, and when executed, will wait in that node until a suitable signal is catched.
-* `signalling_event_process` has a _throwing intermediate signal_ event node, whose `signalRef` attribute corresponds to the the signal reference expected by `signalled_process`
+* `signalling_event_process` has a _throwing intermediate signal_ event node, whose `signalRef` attribute corresponds to the the signal reference expected by `signalled_process`.
 
 There are several gotcha's using this approach:
 
 * The throwing signal node takes only a signal reference as a parameter. There is no possibility to have a particular process instance id as a parameter. As a result, when the throwing signal triggers, *all* the process instances waiting for a signal with the same reference will be triggered.
 * Signalling through a throwing signal event interferes with the Runtime strategy of the deployment unit. The catching of the event will happen in the same thread as the throwing, and in the same KieSession that manages the process instance that throws the event. +
 As a result, signalling through throwing intermediate signal event will only work if the deployment unit uses _SINGLETON_ or _PER_REQUEST_ Runtime strategies, and will fail when using _PER_PROCESS_INSTANCE_. +
-When using _PER_PROCESS_INSTANCE_, the process instances to be signalled cannot be loaded into the same KieSession as the process that throws the signal event, as they are already associated with another KieSession instance 
+When using _PER_PROCESS_INSTANCE_, the process instances to be signalled cannot be loaded into the same KieSession as the process that throws the signal event, as they are already associated with another KieSession instance. 
 
 === Signalling with an action script
 
@@ -94,15 +94,15 @@ image::images/signalling_script_process.png[]
 ----
 
 * To signal a process instance, we need to obtain a KieSession for this instance, taking into account the Runtime strategy of the deployment unit. +
-The action script implementation does this by getting a reference to the RuntimeManager of the current deployment id. 
+The action script implementation does this by getting a reference to the `RuntimeManager` of the current deployment id. 
 * Please note that we assume that both the signalling as the process to be signalled belong to the same deployment package, and as such share the same deployment id.
 
 === Signalling with a custom Work Item Handler
 
 The solution using an action script has a number of drawbacks:
 
-* script nodes are not reusable
-* scripts are more difficult to maintain as they are 'buried' into the process definition
+* script nodes are not reusable;
+* scripts are more difficult to maintain as they are 'buried' into the process definition.
 
 An alternative to a script node, is to use a task node, and associate that task node with a custom work item handler implementation. This task node can easily be reused in different process definitions.
 
@@ -166,7 +166,7 @@ This can be done by adding the following configuration to the WorkDefinitions co
   ]
 ----
 +
-** this defines a new WorkItem type with the name `SignalProcess`. 
+** This defines a new WorkItem type with the name `SignalProcess`. 
 ** We also define two parameters `processToSignal` - which takes the process instance id of the process to signal - and `signalType` - the signal reference. These correspond to the parameters used in our work item handler implementation.
 
 * Our new 'SignalProcess' task is added to the BPMS designer palette, and can be added to process models:
@@ -197,7 +197,7 @@ To get around this, we can signal in an asynchronous way.
 
 The BPMS platform comes with a built-in executor component that offers quite advanced features for asynchronous execution.
 
-The executor component operates on commands, which represents a piece of code that will be executed by the executor component as background job. The command implements `org.kie.internal.executor.api.Command`.
+The executor component operates on commands, which represents a piece of code that will be executed by the executor component as a background job. The command implements `org.kie.internal.executor.api.Command`.
 
 ----
 public interface Command {
@@ -212,7 +212,7 @@ public interface Command {
 }
 ---- 
 
-Input data is transferred from the process engine to the command via the `CommandContext` object. The outcome of the execution is provided to the process engine via ExecutionResults
+Input data is transferred from the process engine to the command via the `CommandContext` object. The outcome of the execution is provided to the process engine via `ExecutionResults`.
 
 BPMS provides an out-of-the-box work item handler backed by the executor component. This handler is registered under the _async_ name in every KieSession created by BPMS. To use executor functionality in a process to execute some code in a asynchronous fashion, you add a task node to the process model with _async_ as task name, and you define a data input called `CommandClass` that takes the fully qualified name of the `Command` implementation class.
 
@@ -262,7 +262,7 @@ public class SignalProcessCommand implements Command {
 }
 ----
 
-The implementation is fairly similar to the synchronous work item handler example above. The WorkItem associated with the process node is passed through the predefined `workItem` context property. Also, we need to dispose of the runtime engine after executing the signal event method on the KieSession.
+The implementation is fairly similar to the synchronous work item handler example above. The work item associated with the process node is passed through the predefined `workItem` context property. Also, we need to dispose of the runtime engine after executing the signal event method on the KieSession.
 
 The implementation class is packaged into the kjar.
 
@@ -300,7 +300,7 @@ image::images/start_signalling_event_process.png[]
 * a signal event has a type (the signal reference) and a value. The value of the event can be used to pass data between the signalling process and the signalled process. +
 In this example we set the process instance id of the signalling process as the event value, and attribute this to a process variable of the process instance started by the signal. +
 The event value is set using data input associations. In this example we map the process instance variable `processInstanceId` to the signal input data object with named `SignalInput`. +
-The process instance id is obtained from the process instance context set in the script node preceding the signal node.
+The process instance id is obtained from the process instance context and set in the script node preceding the signal node.
 +
 image::images/start_signal_data_association.png[]
 +
@@ -352,20 +352,20 @@ The userId to use is:  `jboss`  and the password to use is:  `brms`
 
 image::images/clone_repo.png[width="420"]
 
-Enter _bpms-process-signalling_ as the value of the _repository name_.
+Enter _bpms-process-signalling_ as the value of the _repository name_. +
 The value of _Git URL_ is the URL to this reference architecture in github:
 
 -----
 https://github.com/jboss-gpe-ref-archs/bpms_process_signalling.git
 -----
 
-Once successfully cloned, BPM Suite 6 will pop-up a new dialog box with the message:  _The repository is cloned successfully_
+Once successfully cloned, BPM Suite 6 will pop-up a new dialog box with the message:  _The repository is cloned successfully_.
 
 == Execution and Testing
 
 === Signalling with a _throwing intermediate signal_ event
 
-The `signalling_event_process` and `signalled_process` processes can be used to test out signalling with _throwing intermediate signal_ events. The `signalled_process` process definition has a _catching intermediate signal_ node with signal reference 'signal1'. When an instance of this process is started, it will halt execution in this node, waiting for a suitable signal. The `signalling_event_process` process has a _throwing intermediate signal_ node, with signal reference 'signal1'. So if an instance of this process instance is executed, we would expect instances of _signalled_process_ to be signalled and resume execution.
+The `signalling_event_process` and `signalled_process` processes can be used to test out signalling with _throwing intermediate signal_ events. The `signalled_process` process definition has a _catching intermediate signal_ node with signal reference `signal1`. When an instance of this process is started, it will halt execution in this node, waiting for a suitable signal. The `signalling_event_process` process has a _throwing intermediate signal_ node, with signal reference `signal1`. So if an instance of this process instance is executed, we would expect instances of _signalled_process_ to be signalled and resume execution.
 
 ==== SINGLETON runtime strategy
 
@@ -385,7 +385,7 @@ image::images/deployment_singleton.png[width="800"]
 .. Verify the depoyment strategy, which should be set to _SINGLETON_, which is the default in BPMS.
 
 * Start one or more instances of `signalled_process`:
-. In the `BPM Console`, navigate to `Process Management -> Process Definitions`.
+. In the BPMS Console, navigate to `Process Management -> Process Definitions`.
 . Select the _Start_ icon of the `signalled_process` process definition.
 . An empty form appears. Click the _Play_ button on the bottom of the form to start an instance of the process.
 . Verify that an instance of the `signalled_process` exists in the `Process Management -> Process Definitions` view.
@@ -397,7 +397,7 @@ image::images/signalled_process_instance.png[width="800"]
 * Start an instance of `signalling_event_process`:
 . Go back to `Process Management -> Process Definitions`, and start an instance of `signalling_event_process`.
 
-* In the application logs, we see the following output:
+* In the application logs, you should see output like:
 +
 ----
 09:29:26,339 INFO  [stdout] (http-/172.17.0.9:8080-1) Process 'processTier.signalled_process' with id '1' waiting for signal
@@ -431,7 +431,7 @@ Note that:
 ** Kie Session Name : leave blank
 ** Merge mode : Merge collections
 . Click the `Deploy Unit` button.
-. In `Deploy -> Deployments`, verify that the project deployed sucessfully and that the Runtime strategy has the value `PER_INSTANCE`. 
+. In `Deploy -> Deployments`, verify that the project deployed successfully and that the Runtime strategy has the value `PER_INSTANCE`. 
 +
 image::images/deployment_per_instance.png[width="800"]
 
@@ -488,7 +488,7 @@ This indicates that our instance of `signalled_process` has been correctly signa
 
 === Signalling with a custom work item handler
 
-The `signalling_wih_process` and `signalled_process` processes can be used to test out signalling with an action script. 
+The `signalling_wih_process` and `signalled_process` processes can be used to test out signalling with a custom work item handler. 
 
 * Follow the same steps as above, but use `signalling_wih_process` to signal process instances. 
 * Observe in the logs that the `signalled_process` instances are correctly signalled.
@@ -508,7 +508,8 @@ The `signalling_async_process` process uses the BPMS built-in executor component
 10:12:49,984 INFO  [stdout] (EJB default - 9) Process 'processTier.signalling_async_process' with id '18' after signalling
 ----
 +
-* Signalling happens asynchronously, in a different thread than the one used to start the instance of `signalling_async_process`. Note however that as with synchronous processing, the execution of `signalled_process` is resumed before nodes in `signalling_async_process` after the signal node are executed.
+* Signalling happens asynchronously, in a different thread than the one used to start the instance of `signalling_async_process`. +
+Note however that as with synchronous processing, the execution of `signalled_process` is resumed before nodes in `signalling_async_process` after the signal node are executed.
 * Repeat the test with different runtime strategies.
 
 === Starting a process instance with a _throwing intermediate signal_ event
