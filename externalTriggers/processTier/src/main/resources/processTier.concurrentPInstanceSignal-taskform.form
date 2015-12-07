@@ -1,0 +1,15 @@
+
+<form id="353241502">
+<property name="subject" value=""/>
+<property name="name" value="processTier.concurrentPInstanceSignal-taskform.form"/>
+<property name="displayMode" value="default"/>
+<property name="status" value="0"/>
+<field position="0" name="p1" type="InputTextInteger" id="567967333">
+<property name="fieldRequired" value="false"/>
+<property name="label" value="quot;enquot;,quot;p1 (p1)quot;"/>
+<property name="inputBinding" value=""/>
+<property name="outputBinding" value="p1"/>
+<property name="fieldClass" value="java.lang.Integer"/>
+</field>
+<dataHolder inputId="" name="#0000A0" type="basicType" outId="p1" value="java.lang.Integer" id="p1"/>
+</form>

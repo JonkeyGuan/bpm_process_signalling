@@ -1,0 +1,33 @@
+:data-uri:
+:toc2:
+:ref_arch_doc: link:doc/ref_arch.adoc[user guide]
+
+image::doc/images/rhheader.png[width=900]
+
+:numbered!:
+
+== PURPOSE:
+One of the primary purpose of a Business Process Management (BPM) solution is to manage the wait-state of long running business process instances.
+Typically, the process instance is _signalled_ so as to re-load the process instance from its wait-state and advance it to the next node in the process definition.
+Red Hat's BPM Suite 6 product includes extensive support for signalling of long running process instances in a wait-state.
+
+The purpose of this reference architecture is deep-dive into the _signalling_ capabilities of BPM Suite 6.
+
+This reference architecture includes a BPM Suite 6 _KIE project_ and {ref_arch_doc} that showcase a variety of advanced _signalling_ use-cases.
+
+
+ifdef::showScript[]
+
+Subprocesses:  Multiple Instances
+https://bugzilla.redhat.com/show_bug.cgi?id=1146061
+
+This was a possible Workaround that Kris Verlaen shared to us: 
+
+"It seems the workaround is to make sure the multiple instances properties are filled in correctly, in that case it will reload correctly as well.  More specifically, that means you should try to make sure that the following properties are filled in before saving: 
+
+ - MI Collection Input: should refer to a variable that is a collection of elements, so we can iterate over it and instantiate the subprocess for each element in the collection (for example if you have a variable of type "java.util.List" in your process, you should be able to select that variable in the dropdown)
+ - MI Data Input: the name of the variable that could be used inside the MI subprocess to get a reference to the element of the collection that that MI sub-process instance is processing (something like "item" should be fine)
+
+If these two properties are filled in correctly (which they should be anyway to make it a valid executable process), then reloading the process should restore the MI sub-process correctly."
+
+endif::showScript[]
