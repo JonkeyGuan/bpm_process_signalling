@@ -1,5 +1,4 @@
 :data-uri:
-:bpm_process_signalling: link:doc/bpm_process_signalling.adoc[BPM Suite Signalling Between Process Instances]
 :etrigger: link:externalTriggers/doc/ref_arch.adoc[external triggers]
 :itrigger: link:internalTriggers/doc/bpm_process_signalling.adoc[internal triggers]
 
@@ -9,14 +8,12 @@ image::internalTriggers/doc/images/rhheader.png[width=900]
 
 == PURPOSE:
 
-*{bpm_process_signalling}*
-
 One of the main features of a Business Process Management (BPM) solution is the capability to manage wait-states of long running business process instances. 
 Typically, a process instance waiting in a _wait-state_ node is _signalled_ to have it resume execution and advance to the next node in the process definition. 
 Red Hat’s BPM Suite product includes extensive support for signalling of long running process instances in a wait-state.
 
 Signalling of a process instance can be done through an external trigger. 
-This reference architecture includes examples of process instances via {etrigger}.
+This reference architecture includes examples of signalling of process instances via {etrigger}.
 
 In some use cases, you might want to trigger a process instance in a wait-state from _within_ another process instance.
 This reference architecture also provides a deep-dive into the use of {itrigger} as well. 
